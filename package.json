@@ -1,0 +1,30 @@
+{
+  "name": "offershop-server",
+  "version": "1.0.0",
+  "description": "The server-side for JSWeb final projects",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emilia98/offershop-server.git"
+  },
+  "keywords": [
+    "server",
+    "node",
+    "express"
+  ],
+  "author": "EN",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/emilia98/offershop-server/issues"
+  },
+  "homepage": "https://github.com/emilia98/offershop-server#readme",
+  "dependencies": {
+    "body-parser": "1.18.3",
+    "cors": "2.8.4",
+    "express": "4.16.3",
+    "mongoose": "5.2.7"
+  }
+}
