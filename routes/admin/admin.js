@@ -1,13 +1,15 @@
 const express = require('express');
 const router = express.Router();
 
+const Location = require('../../models/admin/Location');
+
 // TODO: Some middlewares here - for auth & admin
 router.post('/category/new', (req, res) => {
   // console.log(req.body);
   res.json(req.body);
 });
 
-router.post('/location/new', (req, res) => {
+router.post('/location/new', async (req, res) => {
   // console.log('here');
   let data = req.body;
   let hasErrors = false;
@@ -15,10 +17,10 @@ router.post('/location/new', (req, res) => {
 
   let errors = {
     name: {},
-    type: [],
+    type: {},
     postCode: {},
-    latitude: [],
-    longitude: []
+    latitude: {},
+    longitude: {}
   };
   let missingFields = {
     name: false,
@@ -28,9 +30,6 @@ router.post('/location/new', (req, res) => {
     longitude: false
   };
 
-  //console.log(data.name);
-  console.log(req.body);
-  
   if (data.name !== undefined) {
     if (data.name.length < 1 || data.name.length > 100) {
       errors.name['invalidLength'] = true;
@@ -67,6 +66,54 @@ router.post('/location/new', (req, res) => {
     missingFields.postCode = true;
   }
 
+  if (data.latitude !== undefined) {
+    let pattern = /^(-?)(\d*?)(\.?)(\d+)$/g;
+
+    if (pattern.test(data.latitude)) {
+      let toNumber = parseFloat(data.latitude);
+
+      if (toNumber < -90 || toNumber > 90) {
+        errors.latitude['invalidLatitude'] = true;
+        hasErrors = true;
+      }
+    } else {
+      errors.latitude['invalidLatitude'] = true;
+      hasErrors = true;
+    }
+  } else {
+    hasMissingFields = true;
+    missingFields.latitude = true;
+  }
+
+  if (data.longitude !== undefined) {
+    let pattern = /^(-?)(\d*?)(\.?)(\d+)$/g;
+
+    if (pattern.test(data.longitude)) {
+      let toNumber = parseFloat(data.longitude);
+
+      if (toNumber < -180 || toNumber > 180) {
+        errors.longitude['invalidLongitude'] = true;
+        hasErrors = true;
+      }
+    } else {
+      errors.longitude['invalidLongitude'] = true;
+      hasErrors = true;
+    }
+  } else {
+    hasMissingFields = true;
+    missingFields.longitude = true;
+  }
+
+  if (data.type !== undefined) {
+    if (data.type !== 'град' && data.type !== 'село') {
+      errors.type['invalidType'] = true;
+      hasErrors = true;
+    }
+  } else {
+    hasMissingFields = true;
+    missingFields.type = true;
+  }
+
   if (hasMissingFields) {
     return res.status(400).json({
       hasMissingFields: true,
@@ -80,10 +127,27 @@ router.post('/location/new', (req, res) => {
       errors
     });
   }
-  
+
+  let location;
+
+  try {
+    location = await Location.create({
+      name: data.name,
+      locationType: data.type,
+      postCode: data.postCode,
+      latitude: data.latitude,
+      longitude: data.longitude
+    });
+
+    console.log(location);
+  } catch (err) {
+    throw new Error(err);
+  }
+
+ 
   res.status(200).json({
-    'What': 'TF'
-  })
+    'success': 'true'
+  });
 });
 
 module.exports = router;
