@@ -144,10 +144,52 @@ router.post('/location/new', async (req, res) => {
     throw new Error(err);
   }
 
- 
   res.status(200).json({
     'success': 'true'
   });
+});
+
+router.get('/location/list', async (req, res) => {
+
+  let locations;
+
+  try {
+    locations = await Location.find();
+  } catch (err) {
+    res.status(500).json({
+      error: 'Something went wrong! Connect us to solve the problem!'
+    });
+  }
+
+  console.log(locations);
+  res.status(200).json({
+    locations
+  });
+});
+
+router.get('/location/details/:id', async (req, res) => {
+  let id = req.params.id;
+
+  let location;
+
+  try {
+    location = await Location.findById(id);
+    // console.log(location);
+  } catch(err) {
+    return res.status(404).json({
+      hasError: true,
+      message: 'This location does not exist!'
+    });
+    //console.log(err);
+  }
+
+
+  res.status(200).json({
+    hasSuccess: true,
+    location
+  });
+  // return location;
+  // console.log(req.params);
 });
 
 module.exports = router;

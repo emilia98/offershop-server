@@ -21,6 +21,18 @@ const locationSchema = mongoose.Schema({
   longitude: {
     type: Number,
     require: true
+  },
+  createdBy: {
+    type: mongoose.SchemaTypes.ObjectId,
+    default: null
+  },
+  creationDate: {
+    type: mongoose.SchemaTypes.Date,
+    default: Date.now()
+  },
+  isActive: {
+    type: Boolean,
+    default: true
   }
 });
 
