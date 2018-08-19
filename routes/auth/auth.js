@@ -181,7 +181,7 @@ router.post('/login', async (req, res) => {
   let user = await User.findOne({ username: username });
   
   if (!user) {
-    return res.status(401).json({
+    return res.status(400).json({
       hasError: true,
       errorMsg: 'This user does not exist!'
     });
@@ -190,7 +190,7 @@ router.post('/login', async (req, res) => {
   let correctPass = encryption.generateHashedPassword(user.salt, password) === user.hashedPassword;
 
   if (!correctPass) {
-    return res.status(401).json({
+    return res.status(400).json({
       hasError: true,
       errorMsg: 'Invalid password!'
     });

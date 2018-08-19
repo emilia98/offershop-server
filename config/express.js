@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 
 const auth = require('../routes/auth/auth');
 const admin = require('../routes/admin/admin');
+const advert = require('../routes/advert/advert');
 
 module.exports = (app, config) => {
   app.use(cors());
@@ -25,11 +26,42 @@ module.exports = (app, config) => {
     next();
   }); */
 
-  app.use(function(req, res, next) {
-    // check header or url parameters or post parameters for token
+  app.use((req, res, next) => {
+    let authorization = req.headers['authorization'];
+
+    if (!authorization) {
+      return next();
+    }
+
+    let token = authorization.replace('Bearer ', '');
+
+    jwt.verify(token, app.get('jwt_secret'), async (err, decoded) => {
+      if (err) {
+        console.log(err);
+        return res.status(401).json({
+          hasSuccess: false,
+          message: 'You should be authenticated to continue!'
+        });
+      }
+
+      console.log(decoded);
+      let user = await User.findById(decoded.id);
+      req.user = user;
+      console.log(user);
+      next();
+    });
+
+    console.log(authorization);
+  })
+
+  /*
+  app.use((req, res, next) => {
+    // console.log('here');
+
     var token = req.headers['authorization'];
-    if (!token) return next(); //if no token, continue
+    if (!token) return next();
   
+    console.log(token);
     token = token.replace('Bearer ', '');
   
     jwt.verify(token, app.get('jwt_secret'), async function (err, decoded) {
@@ -45,11 +77,13 @@ module.exports = (app, config) => {
 
         let user = await User.findById(decoded.id);
         req.user = user;
+        console.log(user);
         //req.user = user; //set the user to req so other routes can use it
         next();
       }
     });
   });
+  */
   app.post('/', (req, res) => {
     res.json({
       endpoint: 'true'
@@ -59,4 +93,5 @@ module.exports = (app, config) => {
 
   app.use('/admin', admin);
   app.use('/auth', auth);
+  app.use('/advert', advert);
 };

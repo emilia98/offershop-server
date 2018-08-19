@@ -39,6 +39,7 @@ router.post('/location/new', async (req, res) => {
   try {
     location = await Location.create({
       name: data.name,
+      name_to_lower: data.name.toLowerCase(),
       locationType: data.type,
       postCode: data.postCode,
       latitude: data.latitude,
