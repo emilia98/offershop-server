@@ -155,7 +155,8 @@ router.post('/register', async (req, res) => {
       username: username,
       email: email,
       salt: salt,
-      hashedPassword: hashedPassword
+      hashedPassword: hashedPassword,
+      roles: ['User']
     });
 
     profile = await Profile.create({
@@ -168,6 +169,9 @@ router.post('/register', async (req, res) => {
       error: 'Something went wrong while registring a new user!'
     });
   }
+
+  user.profileId = profile._id;
+  await user.save();
 
   res.status(200).json({
     hasSuccess: true
@@ -201,7 +205,7 @@ router.post('/login', async (req, res) => {
   };
 
   let token = jwt.sign(payload, secret, {
-    expiresIn: 60 * 60 * 4
+    expiresIn: 60 * 60 * 24 * 3
   });
 
   return res.status(200).json({

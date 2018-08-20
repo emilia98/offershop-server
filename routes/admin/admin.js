@@ -3,6 +3,26 @@ const router = express.Router();
 
 const validateLocation = require('../../helpers/location').validateLocation;
 const Location = require('../../models/admin/Location');
+const Category = require('../../models/admin/Category');
+
+router.get('/categories/all', async (req, res) => {
+  let categories;
+
+  try {
+    categories = await Category.find();
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      hasSuccess: false,
+      message: 'An error occured while getting categories from database!'
+    });
+  }
+
+  res.status(200).json({
+    hasSuccess: true,
+    categories
+  });
+});
 
 // TODO: Some middlewares here - for auth & admin
 router.post('/category/new', (req, res) => {

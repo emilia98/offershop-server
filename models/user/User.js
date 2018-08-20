@@ -48,7 +48,7 @@ module.exports.generateAdmin = () => {
     }
 
     let salt = encryption.generateSalt();
-    let hashedPassword = encryption.generateHashedPassword(salt, 'admin1234');
+    let hashedPassword = encryption.generateHashedPassword(salt, 'admin');
 
     let admin = await User.create({
       username: 'admin',

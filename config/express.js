@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 
 const auth = require('../routes/auth/auth');
 const admin = require('../routes/admin/admin');
+const category = require('../routes/admin/category');
 const advert = require('../routes/advert/advert');
 
 module.exports = (app, config) => {
@@ -37,22 +38,27 @@ module.exports = (app, config) => {
 
     jwt.verify(token, app.get('jwt_secret'), async (err, decoded) => {
       if (err) {
-        console.log(err);
+        let hasExpired = false;
+        let isInvalid = false;
+        if (err.name === 'TokenExpiredError') {
+          hasExpired = true;
+        } else if (err.name === 'JsonWebTokenError') {
+          isInvalid = true;
+        }
+        
         return res.status(401).json({
           hasSuccess: false,
+          hasExpired,
+          isInvalid,
           message: 'You should be authenticated to continue!'
         });
       }
 
-      console.log(decoded);
       let user = await User.findById(decoded.id);
       req.user = user;
-      console.log(user);
       next();
     });
-
-    console.log(authorization);
-  })
+  });
 
   /*
   app.use((req, res, next) => {
@@ -92,6 +98,7 @@ module.exports = (app, config) => {
   });
 
   app.use('/admin', admin);
+  app.use('/admin/category', category);
   app.use('/auth', auth);
   app.use('/advert', advert);
 };
